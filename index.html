@@ -94,6 +94,22 @@
         width: 90px;
         overflow-wrap: break-word;
       }
+      .avatar {
+        text-transform: uppercase;
+        width: 30px;
+        border-radius: 50%;
+        background-color: #333;
+        color: white;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .header {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
     </style>
   </head>
   <body>
@@ -157,7 +173,7 @@
             img: src,
           });
           input.value = "";
-          src="";
+          src = "";
         }
       });
 
@@ -171,7 +187,7 @@
         if (msg.id == time) {
           item.innerHTML = `<span> ${msg.message} </span>`;
         } else {
-          item.innerHTML = `<span class='username'> ${msg.user} </span> 👇 <br/><span class="msg"> ${msg.message}`;
+          item.innerHTML = `<div class="header"><div class="avatar">${msg.user[0]}</div> <span class='username'> ${msg.user} </span> 👇</div> <span class="msg"> ${msg.message}`;
         }
 
         if (msg.img) {
@@ -186,13 +202,10 @@
           img.height = 200;
           item.innerHTML += "<br/>";
           item.appendChild(img);
-          console.log(src)
+          console.log(src);
         }
 
-
-
         messages.appendChild(item);
-
 
         window.scrollTo(0, document.body.scrollHeight);
       });
