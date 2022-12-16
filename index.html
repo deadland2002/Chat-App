@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My First Node App</title>
+    <style>
+      body {
+        margin: 0;
+        padding-bottom: 3rem;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+      }
+
+      #form {
+        background: rgba(0, 0, 0, 0.15);
+        padding: 0.25rem;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        height: 3rem;
+        box-sizing: border-box;
+        backdrop-filter: blur(10px);
+      }
+      #input {
+        border: none;
+        padding: 0 1rem;
+        flex-grow: 1;
+        border-radius: 2rem;
+        margin: 0.25rem;
+      }
+      #input:focus {
+        outline: none;
+      }
+      #form > button {
+        background: #333;
+        border: none;
+        padding: 0 1rem;
+        margin: 0.25rem;
+        border-radius: 3px;
+        outline: none;
+        color: #fff;
+      }
+
+      #messages {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        margin-top: 35px;
+      }
+
+      #messages > li {
+        padding: 0.5rem 1rem;
+      }
+      #messages > li:nth-child(odd) {
+        background: #efefef;
+      }
+
+      .right {
+        text-align: right;
+      }
+      .username {
+        opacity: 1;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+
+      .navbar {
+        display: flex;
+        justify-content: space-around;
+        background-color: rgb(196, 255, 228);
+        align-items: center;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        padding: 5px 0px;
+      }
+
+      .leave {
+        padding: 3px 10px;
+        border-radius: 20px;
+        background-color: cadetblue;
+        cursor: pointer;
+      }
+      .center {
+        text-align: center;
+      }
+      .upper {
+        text-transform: uppercase;
+      }
+      .file {
+        display: flex;
+        flex-direction: column;
+        width: 90px;
+        overflow-wrap: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar">
+      <span id="username" class="upper"></span>
+      <span onclick="leave()" class="leave">Log out</span>
+    </div>
+
+    <ul id="messages"></ul>
+    <form id="form" action="">
+      <input id="input" autocomplete="off" autofocus />
+      <input
+        type="file"
+        name=""
+        id="img"
+        class="file"
+        onchange="setImgSrc(this)"
+        accept="image/*"
+      />
+      <button>Send</button>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const username = document.getElementById("username");
+
+      var user;
+      var time = new Date();
+      time = time.getTime();
+
+      do {
+        user = prompt("Enter Username : ");
+      } while (user.length == 0);
+
+      username.innerText = user;
+
+      var socket = io();
+
+      socket.on("user connected", (userdata) => {
+        if (userdata.id != time) {
+          var item = document.createElement("li");
+          item.className = "center";
+          item.innerHTML = `<span class='upper'> ${userdata.name}</span> joined`;
+          messages.appendChild(item);
+        }
+      });
+
+      socket.emit("user connected", { name: user, id: time });
+
+      var messages = document.getElementById("messages");
+      var form = document.getElementById("form");
+      var input = document.getElementById("input");
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (input.value) {
+          socket.emit("chat message", {
+            user: user,
+            message: input.value,
+            id: time,
+            img: src,
+          });
+          input.value = "";
+        }
+      });
+
+      socket.on("chat message", function (msg) {
+        var item = document.createElement("li");
+        var classname;
+        msg.id == time ? (classname = "right") : (classname = "left");
+
+        item.className = classname;
+
+        if (msg.id == time) {
+          item.innerHTML = `<span> ${msg.message} </span>`;
+        } else {
+          item.innerHTML = `<span class='username'> ${msg.user} </span> 👇 <br/><span class="msg"> ${msg.message}`;
+        }
+
+        if (msg.img) {
+          var src = msg.img;
+          var img = document.createElement("img");
+          img.src = (window.URL || window.webkitURL).createObjectURL(
+            new Blob([src], {
+              type: "image/png",
+            })
+          );
+          img.width = 200;
+          img.height = 200;
+          item.innerHTML += "<br/>";
+          item.appendChild(img);
+          console.log(src)
+        }
+
+
+
+        messages.appendChild(item);
+
+
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      function leave() {
+        socket.emit("leave user", user);
+        location.reload();
+      }
+
+      socket.on("leave user", (name) => {
+        var item = document.createElement("li");
+        item.className = "center";
+        item.innerHTML = `<span class='upper'> ${name} </span> left `;
+
+        messages.appendChild(item);
+      });
+
+      var src;
+
+      var setImgSrc = (elm) => {
+        var fr = new FileReader();
+        fr.onload = () => (src = fr.result);
+        fr.readAsArrayBuffer(elm.files[0]);
+      };
+    </script>
+  </body>
+</html>
