@@ -48,11 +48,6 @@ io.on('connection', (socket) => {
 
 
 
-
-app.listen(4000 , ()=>{
-  console.log('localhost listening on port : 4000');
+server.listen(3000,() => {
+  console.log('http listening on ip :3000');
 });
-
-// server.listen(3000,'10.8.9.115',() => {
-//   console.log('http listening on ip :3000');
-// });
