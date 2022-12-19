@@ -110,7 +110,19 @@
         gap: 10px;
         align-items: center;
       }
+      img {
+        max-width: 800px;
+        max-height: 500px;
+        min-width: 200px;
+        min-height: 100px;
+        width: auto;
+        height: auto;
+      }
     </style>
+
+
+
+
   </head>
   <body>
     <div class="navbar">
@@ -132,17 +144,30 @@
       <button>Send</button>
     </form>
 
+
+
+
+
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
+      var data = document.cookie;
       const username = document.getElementById("username");
-
       var user;
       var time = new Date();
       time = time.getTime();
+      var name = data.split("=")[1];
 
-      do {
-        user = prompt("Enter Username : ");
-      } while (user.length == 0);
+      if (data.length == 0 || name.length == 0) {
+        do {
+          user = prompt("Enter Username : ");
+        } while (user.length == 0);
+
+        document.cookie = `name=${user};`;
+        location.reload();
+      } else {
+        user = name;
+      }
 
       username.innerText = user;
 
@@ -154,6 +179,7 @@
           item.className = "center";
           item.innerHTML = `<span class='upper'> ${userdata.name}</span> joined`;
           messages.appendChild(item);
+          window.scrollTo(0, document.body.scrollHeight);
         }
       });
 
@@ -198,11 +224,8 @@
               type: "image/png",
             })
           );
-          img.width = 200;
-          img.height = 200;
           item.innerHTML += "<br/>";
           item.appendChild(img);
-          console.log(src);
         }
 
         messages.appendChild(item);
@@ -212,6 +235,7 @@
 
       function leave() {
         socket.emit("leave user", user);
+        document.cookie = "name=";
         location.reload();
       }
 
@@ -221,6 +245,7 @@
         item.innerHTML = `<span class='upper'> ${name} </span> left `;
 
         messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
       });
 
       var src;

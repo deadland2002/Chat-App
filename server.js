@@ -5,16 +5,23 @@ const https = require('https');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
+var cookieParser = require('cookie-parser');
+const { json } = require('body-parser');
+app.use(cookieParser())
+
+var username_cookie;
 
 app.get('/', (req, res) => {
+  username_cookie = req.cookies;
   res.sendFile(__dirname + '/index.html');
 });
 
 
 io.on('connection', (socket) => {
   socket.on('disconnect', (user) => {
-    io.emit('disconnect user',user);
-    // console.log(socket);
+    if(username_cookie){
+      io.emit('leave user',username_cookie.name);
+    }
   });
 
   socket.on('chat message',(msg)=>{ 
@@ -48,6 +55,6 @@ io.on('connection', (socket) => {
 
 
 
-server.listen(3000,() => {
+server.listen(3000,'10.8.9.115',() => {
   console.log('http listening on ip :3000');
 });
