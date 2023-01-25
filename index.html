@@ -8,6 +8,15 @@
         padding-bottom: 3rem;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           Helvetica, Arial, sans-serif;
+        background-image: radial-gradient(
+          circle,
+          #230d3b,
+          #1b123b,
+          #13153b,
+          #0b1739,
+          #051937
+        );
+        color: white;
       }
 
       #form {
@@ -52,12 +61,11 @@
       #messages > li {
         padding: 0.5rem 1rem;
       }
-      #messages > li:nth-child(odd) {
-        background: #efefef;
-      }
 
       .right {
         text-align: right;
+        display: flex;
+        justify-content: flex-end;
       }
       .username {
         opacity: 1;
@@ -66,9 +74,10 @@
       }
 
       .navbar {
+        color: white;
         display: flex;
         justify-content: space-around;
-        background-color: rgb(196, 255, 228);
+        background-color: rgb(46, 12, 71);
         align-items: center;
         position: fixed;
         top: 0;
@@ -79,11 +88,13 @@
       .leave {
         padding: 3px 10px;
         border-radius: 20px;
-        background-color: cadetblue;
+        background-color: rgb(72, 18, 124);
         cursor: pointer;
       }
       .center {
-        text-align: center;
+        text-align: right;
+        display: flex;
+        justify-content: space-around;
       }
       .upper {
         text-transform: uppercase;
@@ -118,11 +129,15 @@
         width: auto;
         height: auto;
       }
+      .container {
+        background-color: #570b70;
+        padding: 5px 10px;
+        height: fit-content;
+        color: white;
+        border-radius: 20px;
+        width: fit-content;
+      }
     </style>
-
-
-
-
   </head>
   <body>
     <div class="navbar">
@@ -143,11 +158,6 @@
       />
       <button>Send</button>
     </form>
-
-
-
-
-
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -177,7 +187,7 @@
         if (userdata.id != time) {
           var item = document.createElement("li");
           item.className = "center";
-          item.innerHTML = `<span class='upper'> ${userdata.name}</span> joined`;
+          item.innerHTML = `<div class="container" ><span class='upper' class="container"> ${userdata.name}</span> joined</div>`;
           messages.appendChild(item);
           window.scrollTo(0, document.body.scrollHeight);
         }
@@ -200,6 +210,8 @@
           });
           input.value = "";
           src = "";
+        }else{
+          alert("text field cannot be empty")
         }
       });
 
@@ -211,9 +223,9 @@
         item.className = classname;
 
         if (msg.id == time) {
-          item.innerHTML = `<span> ${msg.message} </span>`;
+          item.innerHTML = `<div class="container"><span> ${msg.message} </span></div>`;
         } else {
-          item.innerHTML = `<div class="header"><div class="avatar">${msg.user[0]}</div> <span class='username'> ${msg.user} </span> 👇</div> <span class="msg"> ${msg.message}`;
+          item.innerHTML = `<div class="container"><div class="header" ><div class="avatar">${msg.user[0]}</div> <span class='username'> ${msg.user} </span> 👇</div> <span class="msg"> ${msg.message}</div>`;
         }
 
         if (msg.img) {
@@ -242,7 +254,7 @@
       socket.on("leave user", (name) => {
         var item = document.createElement("li");
         item.className = "center";
-        item.innerHTML = `<span class='upper'> ${name} </span> left `;
+        item.innerHTML = `<div class="container"><span class='upper'> ${name} </span> left</div>`;
 
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
